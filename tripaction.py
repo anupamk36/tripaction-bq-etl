@@ -56,8 +56,7 @@ def get_token(client_id: str, client_secret: str) -> Union[str, None]:
     if response.status_code == 200:
         logging.info("Received token for tripaction")
         data = response.json()
-        token_value = "Bearer " + data["access_token"]
-        return token_value
+        return "Bearer " + data["access_token"]
     logging.warning("Error while fetching token: %s", response.status_code)
     return None
 
@@ -84,10 +83,7 @@ def populate_tripaction_data(project_id: str) -> None:
         project_id=project_id, secret_id=Constants.SECRET_ID, version_id="latest"
     )
 
-    token = get_token(client_id=client_id, client_secret=client_secret)
-
-    # Request to get the total page count (count).
-    if token:
+    if token := get_token(client_id=client_id, client_secret=client_secret):
         response = None
         # Time in epoch format required
         start_epoch_time = 0
@@ -119,7 +115,7 @@ def populate_tripaction_data(project_id: str) -> None:
             logging.info("ETL started")
 
             # Function to get complete data from API
-            for page in range(0, count):
+            for page in range(count):
                 headers = {
                     "Authorization": token,
                 }
